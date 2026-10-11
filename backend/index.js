@@ -5,27 +5,34 @@ import { errorHandler } from "./src/middleware/error-handler.js";
 import cors from "cors";
 
 const app = express();
-//we are receiving json
+const PORT = process.env.PORT || 5000;
+
+// Parse incoming JSON requests
 app.use(express.json());
 
-//giving access to our frontend
+// Allow frontend requests.
+// We'll restrict this to your deployed frontend URL later.
 app.use(cors());
 
 app.use("/api", mainRouter);
 
-//error middleware
+// Error-handling middleware
 app.use(errorHandler);
 
 async function startServer() {
   try {
-    let connection = await db.getConnection();
+    const connection = await db.getConnection();
     connection.release();
-    console.log("db connected");
-    app.listen(5000, () => {
-      console.log("server is running on port http://localhost:5000 ");
+
+    console.log("Database connected successfully");
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
   }
 }
+
 startServer();
